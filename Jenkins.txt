@@ -1,0 +1,28 @@
+node (label: 'master'){
+    stage('Functional Test') {
+        echo 'FT'
+        script {
+          def response = httpRequest(url: 'http://10.0.6.221:8082/executeTestPack', acceptType: 'TEXT_HTML', consoleLogResponseBody: true, contentType: 'APPLICATION_JSON_UTF8', httpMode: 'POST', responseHandle: 'STRING', requestBody: '{"testPackName":"SampleApp","device":"9a2dcbb","environment":"AppiumEnv","screenShot":"Yes","sessionALive": "No","performance":""}')
+          println("Status: "+response.status)
+          println("Content: "+response.content)
+          def details = new groovy.json.JsonSlurperClassic().parseText(response.content)
+          println("TestRunID : "+details.testRunID)
+
+          if(details.testRunID != "")
+          {
+            println('{"testrunid":[{"id":\"' + details.testRunID + '\"}]}')
+            //response = httpRequest(url: 'http://10.0.6.221:8082/getTestRunStatus', acceptType: 'TEXT_HTML', consoleLogResponseBody: true, contentType: 'APPLICATION_JSON_UTF8', httpMode: 'POST', responseHandle: 'STRING', requestBody: '{"testrunid":[{"id":\"' + details.testRunID + '\"}]}')
+            //println("Status: "+response.status)
+            //println("Content: "+response.content)
+            //error "This pipeline stops here!"
+          }
+          else
+          {
+            error "RunID Null"
+          }
+      }
+    }
+    
+    
+    
+}
